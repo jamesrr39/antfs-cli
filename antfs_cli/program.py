@@ -201,7 +201,7 @@ class AntFSCLI(Application):
             _logger.exception("Could not set time")
         else:
             print("OK")
-     
+
         directory = self.download_directory()
         # directory.print_list()
 
@@ -228,6 +228,9 @@ class AntFSCLI(Application):
         uploading = [(name, filetype)
                      for name, filetype in local_files
                      if name not in remote_names]
+
+        # download by date descending (latest track first)
+        downloading = sorted(downloading, key=lambda file: file.get_fit_file_number(), reverse=True)
 
         # Remove archived files from the list
         if self._skip_archived:
@@ -373,4 +376,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
