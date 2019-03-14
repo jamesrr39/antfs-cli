@@ -141,6 +141,8 @@ class AntFSCLI(Application):
         self._uploading = args.upload
         self._pair = args.pair
         self._skip_archived = args.skip_archived
+        self.list_only = args.list_only
+        self.track = args.track
 
     def setup_channel(self, channel):
         channel.set_period(4096)
@@ -231,6 +233,19 @@ class AntFSCLI(Application):
 
         # download by date descending (latest track first)
         downloading = sorted(downloading, key=lambda file: file.get_fit_file_number(), reverse=True)
+
+        downloading_file_names = map(lambda x: self.get_filename(x), downloading)
+        print("Tracks available:")
+        for track_name in downloading_file_names:
+            print(track_name)
+
+        if self.list_only:
+            return
+
+        if self.track:
+            track_to_download_index = downloading_file_names.index(self.track)
+            track_to_download = downloading[track_to_download_index]
+            downloading = [track_to_download]
 
         # Remove archived files from the list
         if self._skip_archived:
@@ -325,6 +340,8 @@ def main():
     parser.add_argument("--debug", action="store_true", help="enable debug")
     parser.add_argument("--pair", action="store_true", help="force pairing even if already paired")
     parser.add_argument("-a", "--skip-archived", action="store_true", help="don't download files marked as 'archived' on the watch")
+    parser.add_argument("--track", type=str, help="only download a specific track by filename")
+    parser.add_argument("--list", action="store_true", dest="list_only", help="only list the tracks (don't download)")
     args = parser.parse_args()
 
     # Set up config dir
